@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import{ Lock, User } from 'lucide-react';
+import { useUserStore } from '../stores/useUserStore.js';
 
 
 
 const LoginPage = () => {
-    const [formData,setFormData]= useState({
-        username:"",
-        password:"",
-    });
+    const [username, setUserName]=useState("");
+    const [password, setPassword]=useState("");
+
+    const {login, loading}=useUserStore();
 
     const handleSubmit=(e)=>{
         e.preventDefault();
-        console.log(formData);
+        login(username,password);
+        console.log(username,password);
     }
   return (
     <div className='flex flex-col justify-center py-12 sm:px-6 lg:px-8'>
@@ -45,8 +47,8 @@ const LoginPage = () => {
                                 id='username'
                                 type='username'
                                 required
-                                value={formData.username}
-                                onChange={(e)=>setFormData({...formData,username:e.target.value})}
+                                value={username}
+                                onChange={(e)=>setUserName(e.target.value)}
                                 className='block w-full px-3 py-2 pl-10 bg-gray-700 border border-gray-600
                                 rounded-md shadow-sm
                                 placeholder-gray-400 focus:outline-none focus:ring-emerald-500
@@ -67,8 +69,8 @@ const LoginPage = () => {
                                id='password'
                                type='password'
                                required
-                               value={formData.password}
-                               onChange={(e)=>setFormData({...formData,password:e.target.value})}
+                               value={password}
+                               onChange={(e)=>setPassword(e.target.value)}
                                className='block w-full px-3 py-2 pl-10 bg-gray-700 border border-gray-600
                                rounded-md shadow-sm
                                placeholder-gray-400 focus:outline-none focus:ring-emerald-500

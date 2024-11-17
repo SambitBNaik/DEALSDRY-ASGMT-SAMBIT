@@ -1,4 +1,4 @@
-import React from 'react';
+import React ,{useEffect}from 'react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { Mail, Smartphone, SquareUser, Upload } from 'lucide-react';
@@ -6,7 +6,7 @@ import { Mail, Smartphone, SquareUser, Upload } from 'lucide-react';
 const designations = ["HR", "Manager", "Sales"];
 const courses = ["BCA", "MCA", "BSC"];
 
-const EditEmployeeForm = () => {
+const EditEmployeeForm = ({employee, onClose,updateEmployee}) => {
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -16,10 +16,47 @@ const EditEmployeeForm = () => {
         course: "",
         image: "",
     });
-    const handleSubmit = async (e) => {
+
+    useEffect(() => {
+        if (employee) {
+            setFormData({
+                name: employee.name,
+                email: employee.email,
+                phone: employee.phone,
+                designation: employee.designation,
+                gender: employee.gender,
+                course: employee.course
+            });
+        }
+    }, [employee]);
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setFormData((prevData) => ({
+                    ...prevData,
+                    image: reader.result 
+                }));
+            };
+            reader.readAsDataURL(file); 
+        }
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(formData);
-    }
+        updateEmployee(employee._id, formData); // Update employee details
+        onClose(); // Close the modal after updating
+    };
     return (
         <motion.div
             className='bg-gray-800 shadow-lg rounded-lg p-8 mb-8 max-w-xl mx-auto'
@@ -27,7 +64,16 @@ const EditEmployeeForm = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
         >
+            <div className='flex justify-between'>
             <h2 className='text-2xl font-semibold mb-6 text-emerald-300'>Edit Employee Details</h2>
+            <button
+                    type="button"
+                    className=" text-gray-400 hover:text-white"
+                    onClick={onClose}
+                >
+                    Close
+                </button>
+            </div>
 
             <form className='space-y-4' onSubmit={handleSubmit}>
                 <div>
@@ -42,7 +88,7 @@ const EditEmployeeForm = () => {
                             type='name'
                             id='name'
                             value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            onChange={handleChange}
                             className='mt-1 block w-full bg-gray-700 pl-10 px-3 py-2 border-gray-600 rounded-md shadow-sm 
                              text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500'
                             required
@@ -62,7 +108,7 @@ const EditEmployeeForm = () => {
                             type='email'
                             id='email'
                             value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            onChange={handleChange}
                             className='mt-1 block w-full bg-gray-700 pl-10 px-3 py-2 border-gray-600 rounded-md shadow-sm
                            text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500'
                             required
@@ -82,7 +128,7 @@ const EditEmployeeForm = () => {
                             type='phone'
                             id='phone'
                             value={formData.phone}
-                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            onChange={handleChange}
                             className='mt-1 block w-full bg-gray-700 pl-10 px-3 py-2 border-gray-600 rounded-md shadow-sm
                            text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500'
                             required
@@ -98,7 +144,7 @@ const EditEmployeeForm = () => {
                         <select
                             id="designation"
                             value={formData.designation}
-                            onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
+                            onChange={handleChange}
                             className="mt-1 block w-full bg-gray-700 px-3 py-2 border-gray-600 rounded-md shadow-sm
                           text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                             required
@@ -123,9 +169,9 @@ const EditEmployeeForm = () => {
                                 id="male"
                                 name="gender"
                                 type="radio"
-                                value="male"
-                                checked={formData.gender === "male"}
-                                onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                                value="Male"
+                                checked={formData.gender === "Male"}
+                                onChange={handleChange}
                                 className="appearance-none h-4 w-4 border border-gray-300 rounded-full checked:border-emerald-500 checked:bg-emerald-500 checked:border-4"
                             />
                             <label htmlFor="male" className="ml-2 text-sm font-medium text-gray-300">
@@ -137,9 +183,9 @@ const EditEmployeeForm = () => {
                                 id="female"
                                 name="gender"
                                 type="radio"
-                                value="female"
-                                checked={formData.gender === "female"}
-                                onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                                value="Female"
+                                checked={formData.gender === "Female"}
+                                onChange={handleChange}
                                 className="appearance-none h-4 w-4 border border-gray-300 rounded-full checked:border-emerald-500 checked:bg-emerald-500 checked:border-4"
                             />
                             <label htmlFor="female" className="ml-2 text-sm font-medium text-gray-300">
@@ -157,7 +203,7 @@ const EditEmployeeForm = () => {
                         <select
                             id="course"
                             value={formData.course}
-                            onChange={(e) => setFormData({ ...formData, course: e.target.value })}
+                            onChange={handleChange}
                             className="mt-1 block w-full bg-gray-700 px-3 py-2 border-gray-600 rounded-md shadow-sm
                           text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                             required
@@ -174,7 +220,7 @@ const EditEmployeeForm = () => {
                     </div>
                 </div>
                 <div className='mt-1 flex items-center'>
-                    <input type='file' id='image' className='sr-only' accept='image/*' />
+                    <input type='file' id='image' className='sr-only' accept='image/*' onChange={handleImageChange} />
                     <label
                         htmlFor='image'
                         className='cursor-pointer bg-gray-700 py-2 px-3 border border-gray-600 rounded-md shadow-sm
@@ -194,6 +240,7 @@ const EditEmployeeForm = () => {
                 >
                     Update
                 </button>
+                
             </form>
         </motion.div>
     )

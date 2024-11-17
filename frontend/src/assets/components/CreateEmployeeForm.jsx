@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { Mail, Smartphone, SquareUser, Upload } from 'lucide-react';
+import { useEmployeeStore } from '../../stores/useEmployeeStore';
 
 const designations = ["HR", "Manager", "Sales"];
 const courses = ["BCA", "MCA", "BSC"];
@@ -16,10 +17,41 @@ const CreateEmployeeForm = () => {
         course: "",
         image: "",
     });
+
+    const { createEmployees, loading}=useEmployeeStore();
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(formData);
+        try {
+            await createEmployees(formData);
+            console.log(formData);
+            setFormData({
+                name: "",
+                email: "",
+                phone: "",
+                designation: "",
+                gender: "",
+                course: "",
+                image: "",
+            });
+        } catch (error) {
+            console.log("Error creating a employee details");
+        }
     }
+
+    const handleImageChange=(e)=>{
+        const file = e.target.files[0];
+
+        if(file){
+            const reader= new FileReader();
+
+            reader.onloadend=()=>{
+                setFormData({...formData, image: reader.result});
+            };
+
+            reader.readAsDataURL(file);
+        }
+    };
     return (
         <motion.div
             className='bg-gray-800 shadow-lg rounded-lg p-8 mb-8 max-w-xl mx-auto'
@@ -123,8 +155,8 @@ const CreateEmployeeForm = () => {
                                 id="male"
                                 name="gender"
                                 type="radio"
-                                value="male"
-                                checked={formData.gender === "male"}
+                                value="Male"
+                                checked={formData.gender === "Male"}
                                 onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
                                 className="appearance-none h-4 w-4 border border-gray-300 rounded-full checked:border-emerald-500 checked:bg-emerald-500 checked:border-4"
                             />
@@ -137,8 +169,8 @@ const CreateEmployeeForm = () => {
                                 id="female"
                                 name="gender"
                                 type="radio"
-                                value="female"
-                                checked={formData.gender === "female"}
+                                value="Female"
+                                checked={formData.gender === "Female"}
                                 onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
                                 className="appearance-none h-4 w-4 border border-gray-300 rounded-full checked:border-emerald-500 checked:bg-emerald-500 checked:border-4"
                             />
@@ -174,7 +206,7 @@ const CreateEmployeeForm = () => {
                     </div>
                 </div>
                 <div className='mt-1 flex items-center'>
-                    <input type='file' id='image' className='sr-only' accept='image/*' />
+                    <input type='file' id='image' className='sr-only' accept='image/*' onChange={handleImageChange}/>
                     <label
                         htmlFor='image'
                         className='cursor-pointer bg-gray-700 py-2 px-3 border border-gray-600 rounded-md shadow-sm
